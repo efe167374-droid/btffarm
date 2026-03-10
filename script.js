@@ -121,7 +121,9 @@ if (!prefersReducedMotion) {
   async function validateCode(code) {
     try {
       // Discord bot'undan gelen kodları doğrula
-      const API_URL = 'http://localhost:3000/verify-code';
+      // UYARI: localhost yerine bot'un çalıştığı sunucunun IP/domain adını yazınız
+      // Örn: 'http://192.168.1.100:3000/verify-code' veya 'http://yourserver.com:3000/verify-code'
+      const API_URL = window.location.protocol + '//' + window.location.hostname + ':3000/verify-code';
       
       // API call timeout'u (5 saniye)
       const controller = new AbortController();
@@ -186,12 +188,7 @@ if (!prefersReducedMotion) {
 
     // Kodu doğrula
     if (await validateCode(code)) {
-      // Başarılı - Oturumu kaydet ÖNCE
-      sessionStorage.setItem('codeVerified', 'true');
-      sessionStorage.setItem('verificationTime', new Date().getTime());
-      sessionStorage.setItem('sessionDuration', 30 * 60 * 1000);
-      
-      // Modalı kapat ve gizle
+      // Başarılı - Modalı kapat ve gizle
       codeModalOverlay.classList.add('hidden');
       disableModal();
       
@@ -229,29 +226,14 @@ if (!prefersReducedMotion) {
   document.body.classList.remove('modal-open');
   pageRoot.classList.remove('modal-active');
 
-  // Intro animasyonu bittikten sonra Modal logicini kontrol et (2600ms + 100ms = 2700ms)
+  // Intro animasyonu bittikten sonra Modal'ı göster
   setTimeout(() => {
-    const isVerified = sessionStorage.getItem('codeVerified') === 'true';
-    const verificationTime = parseInt(sessionStorage.getItem('verificationTime') || '0');
-    const sessionDuration = parseInt(sessionStorage.getItem('sessionDuration') || (30 * 60 * 1000));
-    const now = new Date().getTime();
-    
-    // Oturumun süresi dolmuş mu kontrol et
-    const sessionExpired = (now - verificationTime) > sessionDuration;
-    
-    if (isVerified && !sessionExpired) {
-      // Oturum geçerli, modal'ı gösterme
-      codeModalOverlay.style.display = 'none';
-      document.body.classList.remove('modal-open');
-      pageRoot.classList.remove('modal-active');
-    } else {
-      // Oturum yok veya süresi dolmuş, modal'ı göster
-      enableModal();
-      codeModalOverlay.style.display = 'flex';
-      codeModalOverlay.classList.remove('hidden');
-      codeInput.focus();
-    }
-  }, 2700); // Intro 2600ms'de bittiğine göre, hemen sonra kontrol et (100ms margin)
+    // Her giriş için kod istenmesi - Oturum sistemi devre dışı
+    enableModal();
+    codeModalOverlay.style.display = 'flex';
+    codeModalOverlay.classList.remove('hidden');
+    codeInput.focus();
+  }, 2700);
 
   // Enter tuşu ile de form gönder
   codeInput.addEventListener('keypress', (e) => {
