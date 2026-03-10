@@ -121,9 +121,7 @@ if (!prefersReducedMotion) {
   async function validateCode(code) {
     try {
       // Discord bot'undan gelen kodları doğrula
-      // UYARI: localhost yerine bot'un çalıştığı sunucunun IP/domain adını yazınız
-      // Örn: 'http://192.168.1.100:3000/verify-code' veya 'http://yourserver.com:3000/verify-code'
-      const API_URL = window.location.protocol + '//' + window.location.hostname + ':3000/verify-code';
+      const API_URL = 'http://190.2.154.240:3000/verify-code';
       
       // API call timeout'u (5 saniye)
       const controller = new AbortController();
